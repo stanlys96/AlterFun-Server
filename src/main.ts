@@ -12,6 +12,7 @@ async function bootstrap() {
       process.env.FRONTEND_URL,
       process.env.FRONTEND_URL_2,
       process.env.FRONTEND_URL_3,
+      'http://localhost:5173',
     ],
     credentials: true,
   });
