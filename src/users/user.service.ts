@@ -36,9 +36,9 @@ export class UsersService {
 
   async register(createUserDto: CreateUserDto) {
     try {
-      const { name, email, password, method } = createUserDto;
+      const { name, email, password, method, username } = createUserDto;
 
-      if (!name || !email || !password) {
+      if (!name || !email || !password || !username) {
         throw new BadRequestException('All fields are required.');
       }
 
@@ -53,6 +53,7 @@ export class UsersService {
         email: email,
         password: hashedPassword,
         method: method,
+        username: username,
       });
       await this.userRepository.save(newUser);
       return {
