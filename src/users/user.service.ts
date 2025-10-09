@@ -52,7 +52,7 @@ export class UsersService {
         name: name,
         email: email,
         password: hashedPassword,
-        method: method,
+        method: method || 'normal',
         username: username,
       });
       await this.userRepository.save(newUser);
