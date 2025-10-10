@@ -13,6 +13,9 @@ export class CreateUserDto {
   @ApiProperty({ description: 'The password of the user' })
   password: string;
 
+  @ApiProperty({ description: 'The type of the user' })
+  creator: boolean;
+
   @ApiProperty()
   method?: string;
 }

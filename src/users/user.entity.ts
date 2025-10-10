@@ -17,6 +17,9 @@ export class User {
   @Column()
   password: string;
 
+  @Column()
+  creator: boolean;
+
   @Column({ nullable: true })
   method: string;
 
