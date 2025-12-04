@@ -8,14 +8,17 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CreateUserDto, LoginDto } from './user.dto';
+import { CreateUserDto, LoginDto, YouTubeDto } from './user.dto';
 import * as jwt from 'jsonwebtoken';
+import { google } from 'googleapis';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private configService: ConfigService,
   ) {}
 
   async findByEmail(email: string) {
@@ -107,5 +110,19 @@ export class UsersService {
     } catch (e) {
       return { message: 'Invalid credentials', success: false };
     }
+  }
+
+  async getVideoStats(youtubeDto: YouTubeDto) {
+    const youtube = google.youtube({
+      version: 'v3',
+      auth: this.configService.get<string>('YOUTUBE_API_KEY'),
+    });
+
+    const res = await youtube.videos.list({
+      part: 'statistics,snippet',
+      id: youtubeDto.videoId,
+    });
+
+    return res.data.items[0];
   }
 }

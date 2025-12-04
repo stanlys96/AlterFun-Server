@@ -27,3 +27,8 @@ export class LoginDto {
   @ApiProperty()
   password: string;
 }
+
+export class YouTubeDto {
+  @ApiProperty()
+  videoId: string;
+}

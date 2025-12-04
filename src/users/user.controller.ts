@@ -1,7 +1,7 @@
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './user.service';
 import { Body, Controller, Get, HttpStatus, Post, Query } from '@nestjs/common';
-import { CreateUserDto, LoginDto } from './user.dto';
+import { CreateUserDto, LoginDto, YouTubeDto } from './user.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -31,5 +31,10 @@ export class UsersController {
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
     return this.usersService.login(loginDto);
+  }
+
+  @Post('youtube')
+  async youtube(@Body() youtubeDto: YouTubeDto) {
+    return this.usersService.getVideoStats(youtubeDto);
   }
 }
