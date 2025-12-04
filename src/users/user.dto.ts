@@ -37,3 +37,8 @@ export class CodeDto {
   @ApiProperty()
   code: string;
 }
+
+export class OAuthDto {
+  @ApiProperty()
+  oauth2Client: any;
+}

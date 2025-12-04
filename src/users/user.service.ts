@@ -8,7 +8,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CreateUserDto, LoginDto, YouTubeDto, CodeDto } from './user.dto';
+import { CreateUserDto, LoginDto, YouTubeDto, CodeDto, OAuthDto } from './user.dto';
 import * as jwt from 'jsonwebtoken';
 import { google } from 'googleapis';
 import { ConfigService } from '@nestjs/config';
@@ -152,5 +152,21 @@ export class UsersService {
     oauth2Client.setCredentials(tokens);
 
     return tokens;
+  }
+
+  async getAnalytics(oauthDto: OAuthDto) {
+    const youtubeAnalytics = google.youtubeAnalytics("v2");
+
+    const response = await youtubeAnalytics.reports.query({
+      auth: oauthDto.oauth2Client,
+      ids: "channel==MINE",
+      startDate: "2024-01-01",
+      endDate: "2024-12-31",
+      metrics: "views,estimatedMinutesWatched,estimatedRevenue",
+      dimensions: "day",
+      sort: "day",
+    });
+
+    return response.data;
   }
 }
