@@ -8,7 +8,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CreateUserDto, LoginDto, YouTubeDto } from './user.dto';
+import { CreateUserDto, LoginDto, YouTubeDto, CodeDto } from './user.dto';
 import * as jwt from 'jsonwebtoken';
 import { google } from 'googleapis';
 import { ConfigService } from '@nestjs/config';
@@ -119,10 +119,38 @@ export class UsersService {
     });
 
     const res = await youtube.videos.list({
-      part: 'statistics,snippet',
-      id: youtubeDto.videoId,
+      part: ['contentDetails,statistics'],
+      id: [youtubeDto.videoId],
     });
 
-    return res.data.items[0];
+    return res;
+  }
+
+  async loginViaGoogle() {
+    const oauth2Client = new google.auth.OAuth2(
+      this.configService.get<string>('CLIENT_ID'),
+      this.configService.get<string>('CLIENT_SECRET'),
+      this.configService.get<string>('REDIRECT_URI'),
+    );
+    return oauth2Client.generateAuthUrl({
+      access_type: 'offline',
+      prompt: 'consent',
+      scope: [
+        'https://www.googleapis.com/auth/yt-analytics.readonly',
+        'https://www.googleapis.com/auth/youtube.readonly',
+      ],
+    });
+  }
+
+  async handleCallback(codeDto: CodeDto) {
+    const oauth2Client = new google.auth.OAuth2(
+      this.configService.get<string>('CLIENT_ID'),
+      this.configService.get<string>('CLIENT_SECRET'),
+      this.configService.get<string>('REDIRECT_URI')
+    );
+    const { tokens } = await oauth2Client.getToken(code); // exchange code for tokens
+    oauth2Client.setCredentials(tokens);
+
+    return tokens;
   }
 }

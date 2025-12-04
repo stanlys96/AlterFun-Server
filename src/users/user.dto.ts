@@ -32,3 +32,8 @@ export class YouTubeDto {
   @ApiProperty()
   videoId: string;
 }
+
+export class CodeDto {
+  @ApiProperty()
+  code: string;
+}
