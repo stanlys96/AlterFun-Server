@@ -21,6 +21,7 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
+  private tokens;
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -142,8 +143,8 @@ export class UsersService {
       access_type: 'offline',
       prompt: 'consent',
       scope: [
-        'https://www.googleapis.com/auth/yt-analytics.readonly',
         'https://www.googleapis.com/auth/youtube.readonly',
+        'https://www.googleapis.com/auth/yt-analytics.readonly',
       ],
     });
   }
@@ -155,22 +156,32 @@ export class UsersService {
       this.configService.get<string>('REDIRECT_URI'),
     );
     const { tokens } = await oauth2Client.getToken(codeDto.code); // exchange code for tokens
+    this.tokens = tokens;
     oauth2Client.setCredentials(tokens);
 
     return tokens;
   }
 
-  async getAnalytics(oauthDto: OAuthDto) {
-    const youtubeAnalytics = google.youtubeAnalytics('v2');
+  async getAnalytics() {
+    const oauth2Client = new google.auth.OAuth2(
+      this.configService.get<string>('CLIENT_ID'),
+      this.configService.get<string>('CLIENT_SECRET'),
+      this.configService.get<string>('REDIRECT_URI'),
+    );
+    oauth2Client.setCredentials(this.tokens);
+    const youtubeAnalytics = google.youtubeAnalytics({
+      version: 'v2',
+      auth: oauth2Client,
+    });
 
     const response = await youtubeAnalytics.reports.query({
-      auth: oauthDto.oauth2Client,
       ids: 'channel==MINE',
-      startDate: '2024-01-01',
-      endDate: '2024-12-31',
-      metrics: 'views,estimatedMinutesWatched,estimatedRevenue',
+      startDate: '2025-08-01',
+      endDate: '2025-11-30',
+      metrics: 'views,estimatedMinutesWatched',
       dimensions: 'day',
       sort: 'day',
+      // filters: 'video==LeNLCXs6SrY',
     });
 
     return response.data;

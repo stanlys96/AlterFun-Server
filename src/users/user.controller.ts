@@ -1,6 +1,14 @@
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './user.service';
-import { Body, Controller, Get, HttpStatus, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Post,
+  Query,
+  Req,
+} from '@nestjs/common';
 import { CreateUserDto, LoginDto, YouTubeDto } from './user.dto';
 
 @ApiTags('Users')
@@ -36,5 +44,21 @@ export class UsersController {
   @Post('youtube')
   async youtube(@Body() youtubeDto: YouTubeDto) {
     return this.usersService.getVideoStats(youtubeDto);
+  }
+
+  @Get('login-google')
+  async loginGoogle() {
+    return this.usersService.loginViaGoogle();
+  }
+
+  @Get('oauth2callback')
+  async oauthCallback(@Query('code') code: string) {
+    const tokens = this.usersService.handleCallback({ code });
+    return tokens;
+  }
+
+  @Get('youtube-analytics')
+  async getYoutubeAnalytics() {
+    return this.usersService.getAnalytics();
   }
 }
