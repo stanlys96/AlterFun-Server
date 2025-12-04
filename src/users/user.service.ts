@@ -8,7 +8,13 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CreateUserDto, LoginDto, YouTubeDto, CodeDto, OAuthDto } from './user.dto';
+import {
+  CreateUserDto,
+  LoginDto,
+  YouTubeDto,
+  CodeDto,
+  OAuthDto,
+} from './user.dto';
 import * as jwt from 'jsonwebtoken';
 import { google } from 'googleapis';
 import { ConfigService } from '@nestjs/config';
@@ -146,25 +152,25 @@ export class UsersService {
     const oauth2Client = new google.auth.OAuth2(
       this.configService.get<string>('CLIENT_ID'),
       this.configService.get<string>('CLIENT_SECRET'),
-      this.configService.get<string>('REDIRECT_URI')
+      this.configService.get<string>('REDIRECT_URI'),
     );
-    const { tokens } = await oauth2Client.getToken(code); // exchange code for tokens
+    const { tokens } = await oauth2Client.getToken(codeDto.code); // exchange code for tokens
     oauth2Client.setCredentials(tokens);
 
     return tokens;
   }
 
   async getAnalytics(oauthDto: OAuthDto) {
-    const youtubeAnalytics = google.youtubeAnalytics("v2");
+    const youtubeAnalytics = google.youtubeAnalytics('v2');
 
     const response = await youtubeAnalytics.reports.query({
       auth: oauthDto.oauth2Client,
-      ids: "channel==MINE",
-      startDate: "2024-01-01",
-      endDate: "2024-12-31",
-      metrics: "views,estimatedMinutesWatched,estimatedRevenue",
-      dimensions: "day",
-      sort: "day",
+      ids: 'channel==MINE',
+      startDate: '2024-01-01',
+      endDate: '2024-12-31',
+      metrics: 'views,estimatedMinutesWatched,estimatedRevenue',
+      dimensions: 'day',
+      sort: 'day',
     });
 
     return response.data;
